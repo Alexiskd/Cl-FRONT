@@ -1,8 +1,8 @@
 // sitemap-generator.js
-const path = require('path');
-const Sitemap = require('react-router-sitemap').default;
+import path from 'path';
+import Sitemap from 'react-router-sitemap';
 
-// Liste des routes statiques à inclure dans le sitemap
+// Liste de vos routes statiques à inclure dans le sitemap
 const routes = [
   '/',
   '/index.php',
