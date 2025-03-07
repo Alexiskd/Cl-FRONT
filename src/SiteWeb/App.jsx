@@ -23,10 +23,10 @@ const StatistiquesCommandes = lazy(() => import('../AppAdmin/stat.jsx')); // Nou
 // Pages utilisateurs (lazy loading)
 const CommandePagePanier = lazy(() => import('./PagePrincipale/commandePagePanier.jsx'));
 const Login = lazy(() => import("../SiteWeb/HomePage.jsx"));
-import Catalogue from "./PagePrincipale/catologue.jsx"; // Vérifiez le nom du fichier
+import Catalogue from "./PagePrincipale/catologue.jsx"; // Correction du nom de fichier
 const CleDynamicPage = lazy(() => import("./PagePrincipale/CleDynamicPage.jsx"));
 const Coffrefort = lazy(() => import('./PagePrincipale/coffrefort.jsx'));
-const Telecomande = lazy(() => import('./PagePrincipale/telecommande.jsx'));
+const Telecommande = lazy(() => import('./PagePrincipale/telecommande.jsx')); // Correction du nom de variable
 const Badgeuu = lazy(() => import('./PagePrincipale/badge.jsx'));
 const ServiceRedirect = lazy(() => import('./PagePrincipale/serviceredirect.jsx'));
 const Contact = lazy(() => import('./PagePrincipale/contact.jsx'));
@@ -40,7 +40,6 @@ const MultiImageUploader = lazy(() => import('../AppAdmin/multi.jsx'));
 const PolitiqueConfidentialite = lazy(() => import('./PagePrincipale/politique.jsx'));
 const MentionsLegales = lazy(() => import('./PagePrincipale/mentionlegal.jsx'));
 const ConditionsGeneralesDeVente = lazy(() => import('./PagePrincipale/conditiongene.jsx'));
-const KeySearch = lazy(() => import('./PagePrincipale/keyshearch.jsx'));
 
 const AppContainer = styled.div`
   display: flex;
@@ -72,7 +71,7 @@ const App = () => {
   const handleCloseTutorial = () => setShowTutorial(false);
   const isAppRoute = location.pathname.startsWith('/app');
 
-  // Préchargement immédiat des modules lazy
+  // Préchargement immédiat des modules lazy (sans keysearch.jsx)
   useEffect(() => {
     import("./PagePrincipale/CleDynamicPage.jsx");
     import("../AppAdmin/barreadmin.jsx");
@@ -98,7 +97,6 @@ const App = () => {
     import("./PagePrincipale/politique.jsx");
     import("./PagePrincipale/mentionlegal.jsx");
     import("./PagePrincipale/conditiongene.jsx");
-    import("./PagePrincipale/keyshearch.jsx");
   }, []);
 
   // Préchargement des données hors admin
@@ -151,7 +149,7 @@ const App = () => {
                 <Route path="/index.php" element={<Login />} />
                 <Route path="/trouvez.php" element={<Catalogue />} />
                 <Route path="/catalogue-cles-coffre.php" element={<Coffrefort />} />
-                <Route path="/catalogue-telecommandes.php" element={<Telecomande />} />
+                <Route path="/catalogue-telecommandes.php" element={<Telecommande />} />
                 <Route path="/badges.php" element={<Badgeuu />} />
                 <Route path="/services.php" element={<ServiceRedirect />} />
                 <Route path="/cle/double-de-cle.html" element={<ServiceRedirect />} />
@@ -220,4 +218,3 @@ const App = () => {
 };
 
 export default App;
-
