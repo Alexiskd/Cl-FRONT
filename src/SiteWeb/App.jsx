@@ -4,6 +4,7 @@ import { Box, CircularProgress } from '@mui/material';
 import { Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import styled from 'styled-components';
 
+import GoogleTag from './GoogleTag';
 import Header from "./appbar.jsx";
 import Footer from './PagePrincipale/footer.jsx';
 import { CartProvider } from './context/CartContext.jsx';
@@ -18,7 +19,7 @@ const Commande = lazy(() => import('../AppAdmin/commande.jsx'));
 const Messages = lazy(() => import('../AppAdmin/Messages.jsx'));
 const Loginside = lazy(() => import('../AppAdmin/loginside.jsx'));
 const MarqueAdmin = lazy(() => import('../AppAdmin/MarqueAdmin.jsx'));
-const StatistiquesCommandes = lazy(() => import('../AppAdmin/stat.jsx')); // Nouveau composant
+const StatistiquesCommandes = lazy(() => import('../AppAdmin/stat.jsx'));
 
 // Pages utilisateurs (lazy loading)
 const CommandePagePanier = lazy(() => import('./PagePrincipale/commandePagePanier.jsx'));
@@ -26,7 +27,7 @@ const Login = lazy(() => import("../SiteWeb/HomePage.jsx"));
 import Catalogue from "./PagePrincipale/catologue.jsx"; // Correction du nom de fichier
 const CleDynamicPage = lazy(() => import("./PagePrincipale/CleDynamicPage.jsx"));
 const Coffrefort = lazy(() => import('./PagePrincipale/coffrefort.jsx'));
-const Telecommande = lazy(() => import('./PagePrincipale/telecommande.jsx')); // Correction du nom de variable
+const Telecommande = lazy(() => import('./PagePrincipale/telecommande.jsx'));
 const Badgeuu = lazy(() => import('./PagePrincipale/badge.jsx'));
 const ServiceRedirect = lazy(() => import('./PagePrincipale/serviceredirect.jsx'));
 const Contact = lazy(() => import('./PagePrincipale/contact.jsx'));
@@ -71,7 +72,7 @@ const App = () => {
   const handleCloseTutorial = () => setShowTutorial(false);
   const isAppRoute = location.pathname.startsWith('/app');
 
-  // Préchargement immédiat des modules lazy (sans keysearch.jsx)
+  // Préchargement immédiat des modules lazy
   useEffect(() => {
     import("./PagePrincipale/CleDynamicPage.jsx");
     import("../AppAdmin/barreadmin.jsx");
@@ -126,6 +127,7 @@ const App = () => {
           <Helmet>
             {/* Métadonnées */}
           </Helmet>
+          <GoogleTag />
           <noscript>
             <div style={{ padding: '1rem', textAlign: 'center', background: '#f8d7da', color: '#721c24' }}>
               Cette application fonctionne mieux avec JavaScript activé.
