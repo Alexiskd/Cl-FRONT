@@ -3,4 +3,4 @@ RewriteCond %{REQUEST_FILENAME} !-f
 RewriteRule ^ index.html [QSA,L]
 
 RewriteEngine On
-RewriteRule ^https://www.cleservice.com/2-15-cle-ABUS-xp-2-reproduction-cle.html/?$ /produit/ABUS/Cl%C3%A9-Abus-XP-2$[R=301,L]
+RewriteRule ^https://www.cleservice.com/2-15-cle-ABUS-xp-2-reproduction-cle.html/?$ https://cl-front.onrender.com//produit/ABUS/Cl%C3%A9-Abus-XP-2$[R=301,L]
