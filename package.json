@@ -10,7 +10,7 @@
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "typeorm": "typeorm",
-    "sitemap": "node ./chemin/vers/sitemap-builder.cjs"
+    "sitemap": "node sitemap-builder.cjs"
   },
   "dependencies": {
     "@emotion/react": "^11.11.3",
