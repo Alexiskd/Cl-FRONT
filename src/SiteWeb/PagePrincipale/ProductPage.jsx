@@ -113,9 +113,14 @@ const ProductPage = () => {
   const [error, setError] = useState(null);
 
   const finalBrandParam = brandName || num;
-
-  // On transforme le nom du produit selon le format attendu.
   const finalProductName = transformToDisplayName(productName);
+
+  // Pour formater le prix de manière lisible
+  const formatPrice = (price) =>
+    new Intl.NumberFormat('fr-FR', {
+      style: 'currency',
+      currency: 'EUR',
+    }).format(price);
 
   console.log('Nom produit utilisé pour l’API :', finalProductName);
 
@@ -147,10 +152,8 @@ const ProductPage = () => {
     fetchProduct();
   }, [finalProductName]);
 
-  // Pour la navigation, on reformate le nom en version "slug" (motifs séparés par des tirets)
   const formattedProductName = finalProductName.trim().split(' ').join('-');
 
-  // Navigation vers la page de commande en utilisant finalProductName pour le back-end
   const handleOrderNow = useCallback(
     (mode) => {
       if (product) {
@@ -168,7 +171,6 @@ const ProductPage = () => {
     [navigate, product, finalBrandParam, formattedProductName]
   );
 
-  // Navigation pour afficher la page produit
   const handleViewProduct = useCallback(() => {
     if (product) {
       const finalBrand =
@@ -213,19 +215,19 @@ const ProductPage = () => {
       <Container sx={{ mt: 2, mb: 4 }}>
         <StyledCard>
           <Grid container spacing={2}>
-            {product.imageUrl && (
-              <Grid item xs={12} md={4}>
-                <Box
-                  sx={{
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    height: '100%',
-                    p: 2,
-                    cursor: 'pointer',
-                  }}
-                  onClick={handleViewProduct}
-                >
+            <Grid item xs={12} md={4}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  height: '100%',
+                  p: 2,
+                  cursor: 'pointer',
+                }}
+                onClick={handleViewProduct}
+              >
+                {product.imageUrl ? (
                   <CardMedia
                     component="img"
                     image={product.imageUrl}
@@ -238,9 +240,21 @@ const ProductPage = () => {
                       '&:hover': { transform: 'scale(1.1)' },
                     }}
                   />
-                </Box>
-              </Grid>
-            )}
+                ) : (
+                  <CardMedia
+                    component="img"
+                    image="/placeholder-image.png"
+                    alt="Image non disponible"
+                    sx={{
+                      width: '80%',
+                      maxWidth: 150,
+                      objectFit: 'contain',
+                      opacity: 0.5,
+                    }}
+                  />
+                )}
+              </Box>
+            </Grid>
             <Grid item xs={12} md={8}>
               <CardContent>
                 <Typography
@@ -273,7 +287,7 @@ const ProductPage = () => {
                     {Number(product.prix) > 0 && (
                       <>
                         <PricingCell item xs={4}>Copie fabricant</PricingCell>
-                        <PricingCell item xs={4}>{product.prix} €</PricingCell>
+                        <PricingCell item xs={4}>{formatPrice(product.prix)}</PricingCell>
                         <PricingCellNoBorder item xs={4}>
                           Reproduction par numéro et/ou carte de propriété chez le fabricant.
                         </PricingCellNoBorder>
@@ -284,7 +298,7 @@ const ProductPage = () => {
                         <PricingCell item xs={4}>
                           Copie fabricant d'une clé de passe (clé qui ouvre plusieurs serrures)
                         </PricingCell>
-                        <PricingCell item xs={4}>{product.prixCleAPasse} €</PricingCell>
+                        <PricingCell item xs={4}>{formatPrice(product.prixCleAPasse)}</PricingCell>
                         <PricingCellNoBorder item xs={4}>
                           Reproduction par numéro clé de passe : votre clé est un passe.
                         </PricingCellNoBorder>
@@ -292,8 +306,8 @@ const ProductPage = () => {
                     )}
                     {Number(product.prixSansCartePropriete) > 0 && (
                       <>
-                        <PricingCell item xs={4}>Copie dans nos atelier</PricingCell>
-                        <PricingCell item xs={4}>{product.prixSansCartePropriete} €</PricingCell>
+                        <PricingCell item xs={4}>Copie dans nos ateliers</PricingCell>
+                        <PricingCell item xs={4}>{formatPrice(product.prixSansCartePropriete)}</PricingCell>
                         <PricingCellNoBorder item xs={4}>
                           Reproduction dans notre atelier : vous devez nous envoyer la clé en amont.
                         </PricingCellNoBorder>
