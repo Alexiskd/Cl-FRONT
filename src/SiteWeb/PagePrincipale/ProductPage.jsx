@@ -70,7 +70,7 @@ const PricingCellNoBorder = styled(Grid)(({ theme }) => ({
   borderBottom: '1px solid #1B5E20',
 }));
 
-// Fonctions utilitaires
+// Fonction utilitaire pour le délai de livraison
 const getDeliveryDelay = (typeReproduction) => {
   switch (typeReproduction) {
     case 'copie':
@@ -84,38 +84,50 @@ const getDeliveryDelay = (typeReproduction) => {
   }
 };
 
+/**
+ * Transforme le nom brut récupéré depuis l'URL en un format d'affichage standard.
+ * Exemple : "cle-ABUS-d6-reproduction-cle.html" ou "cle-ABUS-d6" devient "Clé Abus D6"
+ */
+const transformToDisplayName = (rawName) => {
+  let nameWithoutSuffix = rawName;
+  if (rawName.toLowerCase().endsWith('-reproduction-cle.html')) {
+    nameWithoutSuffix = rawName.replace(/-reproduction-cle\.html$/i, '');
+  }
+  const segments = nameWithoutSuffix.split('-');
+  return segments
+    .map((seg, index) => {
+      if (index === 0 && seg.toLowerCase() === 'cle') {
+        return 'Clé';
+      }
+      return seg.charAt(0).toUpperCase() + seg.slice(1).toLowerCase();
+    })
+    .join(' ');
+};
+
 const ProductPage = () => {
-  const { brandName, productName } = useParams();
+  // Récupération des paramètres d'URL
+  const { brandName, num, productName } = useParams();
   const navigate = useNavigate();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Vérifier que productName est défini
-  if (!productName) {
-    return (
-      <Container sx={{ mt: 4 }}>
-        <Typography variant="h6" color="error">
-          Nom de produit non spécifié.
-        </Typography>
-      </Container>
-    );
-  }
+  const finalBrandParam = brandName || num;
 
-  // Reconstruire le nom du produit en remplaçant les tirets par des espaces
-  const decodedProductName = productName.replace(/-/g, ' ');
+  // On transforme le nom du produit selon le format attendu.
+  const finalProductName = transformToDisplayName(productName);
 
-  // Remonter en haut de la page au montage
+  console.log('Nom produit utilisé pour l’API :', finalProductName);
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
-  // Requête vers le back end pour récupérer la clé par son nom exact
   useEffect(() => {
     const fetchProduct = async () => {
       try {
         const response = await fetch(
-          `https://cl-back.onrender.com/produit/cles/by-name?nom=${encodeURIComponent(decodedProductName)}`
+          `https://cl-back.onrender.com/produit/cles/by-name?nom=${encodeURIComponent(finalProductName)}`
         );
         if (!response.ok) {
           throw new Error('Produit introuvable.');
@@ -133,31 +145,39 @@ const ProductPage = () => {
       }
     };
     fetchProduct();
-  }, [decodedProductName]);
+  }, [finalProductName]);
 
-  // Navigation vers la page de commande
+  // Pour la navigation, on reformate le nom en version "slug" (motifs séparés par des tirets)
+  const formattedProductName = finalProductName.trim().split(' ').join('-');
+
+  // Navigation vers la page de commande en utilisant finalProductName pour le back-end
   const handleOrderNow = useCallback(
     (mode) => {
       if (product) {
-        const formattedBrand = brandName.toLowerCase().replace(/\s+/g, '-');
-        const formattedProductName = product.nom.trim().replace(/\s+/g, '-');
+        const finalBrand =
+          product.marque
+            ? product.marque.toLowerCase().replace(/\s+/g, '-')
+            : finalBrandParam.toLowerCase().replace(/\s+/g, '-');
         navigate(
-          `/commander/${formattedBrand}/cle/${product.referenceEbauche}/${encodeURIComponent(
+          `/commander/${finalBrand}/cle/${product.referenceEbauche}/${encodeURIComponent(
             formattedProductName
           )}?mode=${mode}`
         );
       }
     },
-    [navigate, product, brandName]
+    [navigate, product, finalBrandParam, formattedProductName]
   );
 
-  // Navigation vers la page produit (même page ici)
+  // Navigation pour afficher la page produit
   const handleViewProduct = useCallback(() => {
     if (product) {
-      const formattedProductName = product.nom.trim().replace(/\s+/g, '-');
-      navigate(`/produit/${brandName}/${encodeURIComponent(formattedProductName)}`);
+      const finalBrand =
+        product.marque
+          ? product.marque.toLowerCase().replace(/\s+/g, '-')
+          : finalBrandParam.toLowerCase().replace(/\s+/g, '-');
+      navigate(`/produit/${finalBrand}/${encodeURIComponent(formattedProductName)}`);
     }
-  }, [navigate, product, brandName]);
+  }, [navigate, product, finalBrandParam, formattedProductName]);
 
   if (loading) {
     return (
@@ -209,7 +229,7 @@ const ProductPage = () => {
                   <CardMedia
                     component="img"
                     image={product.imageUrl}
-                    alt={product.nom}
+                    alt={finalProductName}
                     sx={{
                       width: '80%',
                       maxWidth: 150,
@@ -228,7 +248,7 @@ const ProductPage = () => {
                   sx={{ color: '#1B5E20', fontWeight: 'bold', mb: 1, cursor: 'pointer' }}
                   onClick={handleViewProduct}
                 >
-                  {product.nom}
+                  {finalProductName}
                 </Typography>
                 {product.marque && (
                   <Typography variant="h4" sx={{ color: '#1B5E20', fontWeight: 'medium', mb: 2 }}>
@@ -252,14 +272,10 @@ const ProductPage = () => {
                     </PricingCellNoBorder>
                     {Number(product.prix) > 0 && (
                       <>
-                        <PricingCell item xs={4}>
-                          Copie fabricant
-                        </PricingCell>
-                        <PricingCell item xs={4}>
-                          {product.prix} €
-                        </PricingCell>
+                        <PricingCell item xs={4}>Copie fabricant</PricingCell>
+                        <PricingCell item xs={4}>{product.prix} €</PricingCell>
                         <PricingCellNoBorder item xs={4}>
-                          Reproduction par numéro et/ou carte de propriété chez le fabricant. Vous n'avez pas besoin d'envoyer la clé en amont.
+                          Reproduction par numéro et/ou carte de propriété chez le fabricant.
                         </PricingCellNoBorder>
                       </>
                     )}
@@ -268,24 +284,18 @@ const ProductPage = () => {
                         <PricingCell item xs={4}>
                           Copie fabricant d'une clé de passe (clé qui ouvre plusieurs serrures)
                         </PricingCell>
-                        <PricingCell item xs={4}>
-                          {product.prixCleAPasse} €
-                        </PricingCell>
+                        <PricingCell item xs={4}>{product.prixCleAPasse} €</PricingCell>
                         <PricingCellNoBorder item xs={4}>
-                          Reproduction par numéro clé de passe : votre clé est un passe, qui ouvre plusieurs serrures. Vous n'avez pas besoin d'envoyer leur clé en amont.
+                          Reproduction par numéro clé de passe : votre clé est un passe.
                         </PricingCellNoBorder>
                       </>
                     )}
                     {Number(product.prixSansCartePropriete) > 0 && (
                       <>
-                        <PricingCell item xs={4}>
-                          Copie dans nos atelier
-                        </PricingCell>
-                        <PricingCell item xs={4}>
-                          {product.prixSansCartePropriete} €
-                        </PricingCell>
+                        <PricingCell item xs={4}>Copie dans nos atelier</PricingCell>
+                        <PricingCell item xs={4}>{product.prixSansCartePropriete} €</PricingCell>
                         <PricingCellNoBorder item xs={4}>
-                          Reproduction dans notre atelier : vous devez nous envoyer la clé en amont et nous vous la renverrons accompagnée de sa copie (clé à passe ou clé normale).
+                          Reproduction dans notre atelier : vous devez nous envoyer la clé en amont.
                         </PricingCellNoBorder>
                       </>
                     )}
