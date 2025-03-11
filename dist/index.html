@@ -4,11 +4,12 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" href="/assets/favicon-BTiyE4Hv.ico" />
+    <link rel="icon" href="/src/assets/icons/favicon.ico" />
     <title>Cleservice</title>
-    <script type="module" crossorigin src="/assets/index-6iWKD2A3.js"></script>
   </head>
   <body>
-    <div id="root"></div>
+    <!-- L'output SSR sera injecté ici -->
+    <div id="root"><!--ssr-outlet--></div>
+    <script type="module" src="/src/entry-client.jsx"></script>
   </body>
 </html>
